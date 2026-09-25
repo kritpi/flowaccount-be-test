@@ -3,6 +3,8 @@ import {
   type ProductCategory,
   type ProductDomain,
   type ProductCreateDomain,
+  type ProductListFilter,
+  type ProductSellDomain,
 } from "../domain/product.ts";
 import { ValidationError } from "../errors.ts";
 
@@ -24,7 +26,13 @@ export type ProductResponseDto = {
   createdAt: string;
 };
 
+export type ProductSellDto = {
+  productId: number;
+  quantity: number;
+};
+
 const SKU_MIN_LENGTH = 3;
+const INVALID_CATEGORY_MESSAGE = `หมวดหมู่ต้องเป็นหนึ่งใน: ${PRODUCT_CATEGORIES.join(", ")}`;
 
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim() !== "";
@@ -61,7 +69,7 @@ export const toProductCreate = (body: unknown): ProductCreateDomain => {
   }
 
   if (!isProductCategory(category)) {
-    errors.push(`หมวดหมู่ต้องเป็นหนึ่งใน: ${PRODUCT_CATEGORIES.join(", ")}`);
+    errors.push(INVALID_CATEGORY_MESSAGE);
   }
 
   if (errors.length > 0) {
@@ -77,7 +85,41 @@ export const toProductCreate = (body: unknown): ProductCreateDomain => {
   };
 };
 
-export const toProductResponse = (product: ProductDomain): ProductResponseDto => ({
+export const toProductListFilter = (query: unknown): ProductListFilter => {
+  const { category } = (query ?? {}) as { category?: unknown };
+
+  if (category === undefined) {
+    return {};
+  }
+
+  if (!isProductCategory(category)) {
+    throw new ValidationError([INVALID_CATEGORY_MESSAGE]);
+  }
+
+  return { category };
+};
+
+// Order matters: quantity is checked before the product lookup in the service.
+export const toProductSell = (body: unknown): ProductSellDomain => {
+  const { productId, quantity } = (body ?? {}) as Partial<ProductSellDto>;
+  const errors: string[] = [];
+
+  if (!isPositiveInteger(quantity)) {
+    errors.push("จำนวนที่ขายต้องมากกว่า 0");
+  }
+
+  if (!isPositiveInteger(productId)) {
+    errors.push("productId ต้องเป็นจำนวนเต็มที่มากกว่า 0");
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError(errors);
+  }
+
+  return { productId: productId as number, quantity: quantity as number };
+};
+
+export const toProductResponse =(product: ProductDomain): ProductResponseDto => ({
   id: product.id,
   name: product.name,
   sku: product.sku,
