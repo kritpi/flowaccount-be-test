@@ -1,0 +1,31 @@
+{
+  "name": "flowaccount-be-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/index.ts",
+  "scripts": {
+    "dev": "node --watch app/index.ts",
+    "start": "node app/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kritpi/flowaccount-be-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/kritpi/flowaccount-be-test/issues"
+  },
+  "homepage": "https://github.com/kritpi/flowaccount-be-test#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2"
+  }
+}
