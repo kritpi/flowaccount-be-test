@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --watch app/index.ts",
     "start": "node app/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test"
   },
   "repository": {
     "type": "git",

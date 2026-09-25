@@ -1,13 +1,20 @@
-import { randomUUID } from "node:crypto";
 import type { ProductDomain, ProductCreateDomain } from "../domain/product.ts";
-import { productRepository } from "../repository/product-repository.ts";
+import { ValidationError } from "../errors.ts";
+import { productRepository, type ProductRepository } from "../repository/product-repository.ts";
 
-export const productCreateService = async (input: ProductCreateDomain): Promise<ProductDomain> => {
+export const productCreateService = async (
+  input: ProductCreateDomain,
+  repo: ProductRepository = productRepository,
+): Promise<ProductDomain> => {
+  if (await repo.findBySku(input.sku)) {
+    throw new ValidationError(["รหัสสินค้านี้มีอยู่แล้ว"]);
+  }
+
   const product: ProductDomain = {
-    id: randomUUID(),
-    name: input.name,
+    id: repo.nextId(),
+    ...input,
     createdAt: new Date(),
   };
 
-  return productRepository.save(product);
+  return repo.save(product);
 };
